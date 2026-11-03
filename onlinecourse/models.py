@@ -108,6 +108,20 @@ class Question(models.Model):
     content = models.CharField(max_length=2000)
     grade = models.IntegerField(default=50)
 
+    @property
+    def question_text(self):
+        return self.content
+
+    def is_get_score(self, selected_choice_ids):
+        correct_ids = set(
+            self.choices.filter(is_correct=True).values_list('id', flat=True)
+        )
+        selected_ids = {
+            choice_id for choice_id in selected_choice_ids
+            if self.choices.filter(id=choice_id).exists()
+        }
+        return bool(correct_ids) and selected_ids == correct_ids
+
     def __str__(self):
         return self.content
 
